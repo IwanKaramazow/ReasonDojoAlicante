@@ -1,0 +1,62 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-weight: bold;
+  font-size: 14px;
+}
+.container {
+  width: 100%;
+  margin-top: 20px;
+  position: relative;
+}
+.board {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 30px;
+}
+
+.item {
+  position: relative;
+  height: 90px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.item::before {
+  position: absolute;
+  content: "";
+  bottom: 0;
+  width: 112px;
+  height: 61px;
+  background: url("gameitemback.png") no-repeat bottom center;
+  background-size: contain;
+  z-index: 2;
+}
+
+.item::after {
+  position: absolute;
+  content: "";
+  left: 31px;
+  bottom: -64px;
+  width: 49px;
+  height: 64px;
+  background: url("gameitemfront.png") no-repeat;
+  background-size: contain;
+  z-index: 1;
+  transition: 0.2s all;
+}
+
+.active::after {
+  bottom: 20px;
+}
+
+.header {
+  justify-content: center;
+}
+
+.footer {
+  margin-top: 2em;
+  display: flex;
+  justify-content: center;
+}

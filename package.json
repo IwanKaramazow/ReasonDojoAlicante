@@ -1,0 +1,16 @@
+{
+  "name": "ReasonDojoAlicante",
+  "version": "0.0.1",
+  "description": "Beyond the frontend",
+  "main": "Index.re",
+  "repository": "https://github.com/IwanKaramazow/ReasonDojoAlicante",
+  "author": "Iwan <valcke.maxim@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "bs-platform": "^4.0.7",
+    "parcel-bundler": "^1.10.3",
+    "react": "^16.6.0",
+    "react-dom": "^16.6.0",
+    "reason-react": "^0.5.3"
+  }
+}
