@@ -237,7 +237,7 @@ Example: `<Board activeMole=self.state.activeMole />`
 
 **TIP** Variants can contain data, with pattern matching you can extract that data
 
-```
+```reason
 type action =
     | ChangeActiveMole(int);
 
