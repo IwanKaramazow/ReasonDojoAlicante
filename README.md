@@ -105,7 +105,7 @@ myArray
 
 **TIP** ReasonReact uses React under the hood. Since classes are set via javascript, the following syntax needs to be used: `className="board-item"`
 
-3. Blueprint
+### 3. Static vs dynamic
 
 Although our static version is great, the board should only be rendered as soon as the player clicked on our start button.
 
@@ -148,7 +148,7 @@ let me = {
 
   Can you create a variant `type status` that represents whether the game has started or not? Add an extra `status` field in the `state` type that contains your variant.
 
-4. It's alive!
+### 4. It's alive!
 
 Time to connect our state type to our `App` component!
 
@@ -222,9 +222,9 @@ let make = (_children) => {
 
 If you click on the start button, the board should now appear!
 
-5. Moles
+### 5. Moles
 
-- modify `type state` in `App.re` to include an int that represents the active mole.
+- modify `type state` in `App.re` to include an extra field that represents the active mole.
 
 **TIP** don't forget to update the `initialState` function
 
@@ -256,7 +256,8 @@ reducer: (state, action) => {
             {...state, started: true},
             (self) => {
                 let _ = Js.Global.setInterval(() => {
-                    self.send(Ping)
+                    let randomInt = Js.Math.random_int(0, 9);
+                    self.send(Ping(randomInt))
                 }, 1000);
             }
         )
@@ -265,12 +266,12 @@ reducer: (state, action) => {
 
 - Change the implementation of `Board`: a visible mole has the `"mole visible"` className instead of `mole`.
 
-6. The sky is the limit
+### 6. The sky is the limit
 
 By now, you know enough Reason & ReasonReact to continue on your own. The sky is the limit, try to implement your own features.
 
 Examples:
 
-- add an extra component that renders the score
+- render the score
 - add an extra action that increases the score if you click on an active mole.
 - add a reset button, to reset your game
