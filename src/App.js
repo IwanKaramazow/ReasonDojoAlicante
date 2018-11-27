@@ -2,13 +2,20 @@
 'use strict';
 
 var Block = require("bs-platform/lib/js/block.js");
+var Board = require("./Board.js");
 var Curry = require("bs-platform/lib/js/curry.js");
+var Score = require("./Score.js");
 var React = require("react");
+var Button = require("./Button.js");
 var Js_math = require("bs-platform/lib/js/js_math.js");
-var Belt_Array = require("bs-platform/lib/js/belt_Array.js");
+var Caml_int32 = require("bs-platform/lib/js/caml_int32.js");
 var ReasonReact = require("reason-react/src/ReasonReact.js");
 
 var component = ReasonReact.reducerComponent("App");
+
+function computeTimeout(score) {
+  return 1000 - Caml_int32.imul(20, score) | 0;
+}
 
 function make(_children) {
   return /* record */[
@@ -22,80 +29,65 @@ function make(_children) {
           /* willUpdate */component[/* willUpdate */7],
           /* shouldUpdate */component[/* shouldUpdate */8],
           /* render */(function (self) {
-              var cn = function (ix, activeIx) {
-                var match = ix === activeIx;
-                if (match) {
-                  return "item active";
-                } else {
-                  return "item";
-                }
-              };
-              var score = String(self[/* state */1][/* score */2]);
-              var match = self[/* state */1][/* status */0];
+              var match = self[/* state */1][/* game */0];
               return React.createElement("div", {
-                          className: "container"
-                        }, React.createElement("div", {
-                              className: "header"
-                            }, React.createElement("h1", undefined, "" + (String(score) + " fantas catched"))), React.createElement("div", {
-                              className: "board"
-                            }, Belt_Array.map(Belt_Array.range(0, 5), (function (ix) {
-                                    return React.createElement("div", {
-                                                key: String(ix),
-                                                className: cn(ix, self[/* state */1][/* activeIx */1]),
-                                                onClick: (function (param) {
-                                                    return Curry._1(self[/* send */3], /* Whack */[ix]);
-                                                  })
-                                              });
-                                  }))), React.createElement("div", {
-                              className: "footer"
-                            }, match ? null : React.createElement("button", {
-                                    onClick: (function (param) {
-                                        return Curry._1(self[/* send */3], /* Start */0);
-                                      })
-                                  }, "Start!")));
+                          className: "app"
+                        }, match ? React.createElement(React.Fragment, undefined, ReasonReact.element(undefined, undefined, Board.make(self[/* state */1][/* activeIx */2], (function (index) {
+                                          return Curry._1(self[/* send */3], /* Hit */Block.__(0, [index]));
+                                        }), self[/* state */1][/* clickedIx */3], /* array */[])), ReasonReact.element(undefined, undefined, Score.make(self[/* state */1][/* score */1], /* array */[]))) : ReasonReact.element(undefined, undefined, Button.make("Start game!", (function (param) {
+                                      return Curry._1(self[/* send */3], /* StartGame */0);
+                                    }), /* array */[])));
             }),
           /* initialState */(function (param) {
               return /* record */[
-                      /* status : Waiting */0,
+                      /* game : Waiting */0,
+                      /* score */0,
                       /* activeIx */-1,
-                      /* score */0
+                      /* clickedIx */-1
                     ];
             }),
           /* retainedProps */component[/* retainedProps */11],
           /* reducer */(function (action, state) {
               if (typeof action === "number") {
-                if (action !== 0) {
-                  var activeIx = Js_math.random_int(0, 6);
-                  return /* Update */Block.__(0, [/* record */[
-                              /* status */state[/* status */0],
-                              /* activeIx */activeIx,
-                              /* score */state[/* score */2]
-                            ]]);
-                } else {
-                  return /* UpdateWithSideEffects */Block.__(2, [
-                            /* record */[
-                              /* status : Playing */1,
-                              /* activeIx */state[/* activeIx */1],
-                              /* score */state[/* score */2]
-                            ],
-                            (function (self) {
-                                var intervalId = setInterval((function (param) {
-                                        return Curry._1(self[/* send */3], /* RequestNewAppearance */1);
-                                      }), 1000);
-                                return Curry._1(self[/* onUnmount */4], (function (param) {
-                                              clearInterval(intervalId);
-                                              return /* () */0;
-                                            }));
-                              })
-                          ]);
-                }
+                return /* UpdateWithSideEffects */Block.__(2, [
+                          /* record */[
+                            /* game : Playing */1,
+                            /* score */0,
+                            /* activeIx */state[/* activeIx */2],
+                            /* clickedIx */-1
+                          ],
+                          (function (self) {
+                              setTimeout((function (param) {
+                                      var nextActive = Js_math.random_int(0, 9);
+                                      return Curry._1(self[/* send */3], /* Appear */Block.__(1, [nextActive]));
+                                    }), computeTimeout(self[/* state */1][/* score */1]));
+                              return /* () */0;
+                            })
+                        ]);
+              } else if (action.tag) {
+                return /* UpdateWithSideEffects */Block.__(2, [
+                          /* record */[
+                            /* game */state[/* game */0],
+                            /* score */state[/* score */1],
+                            /* activeIx */action[0],
+                            /* clickedIx */-1
+                          ],
+                          (function (self) {
+                              setTimeout((function (param) {
+                                      var nextActive = Js_math.random_int(0, 9);
+                                      return Curry._1(self[/* send */3], /* Appear */Block.__(1, [nextActive]));
+                                    }), computeTimeout(self[/* state */1][/* score */1]));
+                              return /* () */0;
+                            })
+                        ]);
               } else {
-                var match = action[0] === state[/* activeIx */1];
-                if (match) {
+                var index = action[0];
+                if (index === state[/* activeIx */2]) {
                   return /* Update */Block.__(0, [/* record */[
-                              /* status */state[/* status */0],
-                              /* activeIx */-1,
-                              /* score */state[/* score */2] + 1 | 0
+                              /* game */state[/* game */0],
+                              /* score */state[/* score */1] + 1 | 0,
+                              /* activeIx */state[/* activeIx */2],
+                              /* clickedIx */index
                             ]]);
                 } else {
                   return /* NoUpdate */0;
@@ -107,5 +99,6 @@ function make(_children) {
 }
 
 exports.component = component;
+exports.computeTimeout = computeTimeout;
 exports.make = make;
 /* component Not a pure module */

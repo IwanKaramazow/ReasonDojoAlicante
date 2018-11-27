@@ -6,6 +6,10 @@
   "repository": "https://github.com/IwanKaramazow/ReasonDojoAlicante",
   "author": "Iwan <valcke.maxim@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "start": "bsb -make-world -w",
+    "bundle": "parcel static/index.html"
+  },
   "dependencies": {
     "bs-platform": "^4.0.7",
     "parcel-bundler": "^1.10.3",

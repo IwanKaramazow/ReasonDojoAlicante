@@ -1,83 +1,94 @@
-type status =
+type game =
   | Waiting
   | Playing;
 
 type action =
-  | Start
-  | Whack(int)
-  | RequestNewAppearance;
+  | StartGame
+  | Hit(int)
+  | Appear(int);
 
 type state = {
-  status,
-  activeIx: int,
+  game,
   score: int,
+  activeIx: int,
+  clickedIx: int,
 };
 
 let component = ReasonReact.reducerComponent("App");
 
+let computeTimeout = score => 1000 - 20 * score;
+
 let make = _children => {
   ...component,
-  initialState: _ => {status: Waiting, activeIx: (-1), score: 0},
+
+  initialState: _ => {
+    game: Waiting,
+    score: 0,
+    activeIx: (-1),
+    clickedIx: (-1),
+  },
+
   reducer: (action, state) =>
     switch (action) {
-    | Start =>
+    | StartGame =>
       ReasonReact.UpdateWithSideEffects(
-        {...state, status: Playing},
+        {...state, game: Playing, score: 0, clickedIx: (-1)},
         (
-          self => {
-            let intervalId =
-              Js.Global.setInterval(
-                () => self.send(RequestNewAppearance),
-                1000,
-              );
-            self.onUnmount(() => Js.Global.clearInterval(intervalId));
-          }
+          self =>
+            Js.Global.setTimeout(
+              () => {
+                let nextActive = Js.Math.random_int(0, 9);
+                self.send(Appear(nextActive));
+              },
+              computeTimeout(self.state.score),
+            )
+            ->ignore
         ),
       )
-    | RequestNewAppearance =>
-      let activeIx = Js.Math.random_int(0, 6);
-      ReasonReact.Update({...state, activeIx});
-    | Whack(ix) =>
-      ix === state.activeIx ?
+    | Appear(next) =>
+      ReasonReact.UpdateWithSideEffects(
+        {...state, activeIx: next, clickedIx: (-1)},
+        (
+          self =>
+            Js.Global.setTimeout(
+              () => {
+                let nextActive = Js.Math.random_int(0, 9);
+                self.send(Appear(nextActive));
+              },
+              computeTimeout(self.state.score),
+            )
+            ->ignore
+        ),
+      )
+
+    | Hit(index) =>
+      if (index === state.activeIx) {
         ReasonReact.Update({
           ...state,
-          activeIx: (-1),
           score: state.score + 1,
-        }) :
-        ReasonReact.NoUpdate
+          clickedIx: index,
+        });
+      } else {
+        ReasonReact.NoUpdate;
+      }
     },
 
-  render: self => {
-    let cn = (ix, activeIx) => ix === activeIx ? "item active" : "item";
-    let handleClick = (ix, _) => self.send(Whack(ix));
-
-    let score = self.state.score->string_of_int;
-    <div className="container">
-      <div className="header">
-        <h1> {ReasonReact.string({j|$score fantas catched|j})} </h1>
-      </div>
-      <div className="board">
-        {
-          Belt.Array.range(0, 5)
-          ->Belt.Array.map(ix =>
-              <div
-                key={string_of_int(ix)}
-                className={cn(ix, self.state.activeIx)}
-                onClick={handleClick(ix)}
-              />
-            )
-          ->ReasonReact.array
+  render: self =>
+    <div className="app">
+      {
+        switch (self.state.game) {
+        | Waiting =>
+          <Button text="Start game!" onClick=(_ => self.send(StartGame)) />
+        | Playing =>
+          <>
+            <Board
+              onClick=(index => self.send(Hit(index)))
+              activeIx={self.state.activeIx}
+              clickedIx={self.state.clickedIx}
+            />
+            <Score score={self.state.score} />
+          </>
         }
-      </div>
-      <div className="footer">
-        {switch (self.state.status) {
-         | Waiting =>
-           <button onClick={_ => self.send(Start)}>
-             {ReasonReact.string("Start!")}
-           </button>
-         | Playing => ReasonReact.null
-         }}
-      </div>
-    </div>;
-  },
+      }
+    </div>,
 };
