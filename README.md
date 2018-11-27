@@ -165,7 +165,7 @@ type action =
 
 - Augment the components `make` function with a function that returns the initial state for your component. Example:
 
-```
+```reason
 let make = (_children) => {
   ...component,
   /* override the initialState function, with our own implementation */
@@ -175,7 +175,7 @@ let make = (_children) => {
 - Augment the `make` function with a `reducer` function that handles your `Start` action.
   Example:
 
-```
+```reason
 let make = (_children) => {
     ...component,
     reducer: (action, state) =>
@@ -207,7 +207,7 @@ let make = (_children) => {
 
 **Tip**: `self` is just a record that contains the state:
 
-```
+```reason
     type self = {
         state: state,
         send: /* function to send actions to a reducer component */
